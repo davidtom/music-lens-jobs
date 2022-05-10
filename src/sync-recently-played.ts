@@ -4,8 +4,7 @@ import { z } from "zod";
 
 const Config = z.object({
   origin: z.string(),
-  // TODO:
-  // auth_secret: z.string(),
+  api_secret: z.string(),
 });
 
 type User = {
@@ -24,7 +23,7 @@ export const run = async (): Promise<void> => {
   }
 
   const { data: config } = parsedConfig;
-  const { origin } = config;
+  const { origin, api_secret } = config;
 
   // Get user ids json array
   const { data: users } = await axios.get<User[]>(`${origin}/api/users/`);
@@ -34,7 +33,12 @@ export const run = async (): Promise<void> => {
   for (const user of users) {
     try {
       const { data: syncResult } = await axios(
-        `${origin}/api/sync/recently-played/${user.id}`
+        `${origin}/api/sync/recently-played/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${api_secret}`,
+          },
+        }
       );
 
       log("Sync succeeded", syncResult);
