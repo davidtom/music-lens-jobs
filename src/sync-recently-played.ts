@@ -41,7 +41,7 @@ export const run = async (): Promise<void> => {
         }
       );
 
-      log("Sync succeeded", syncResult);
+      logger.log("Sync succeeded", syncResult);
     } catch (err: any) {
       handleError(err);
     }
@@ -56,15 +56,13 @@ export const run = async (): Promise<void> => {
 const handleError = (err: any): void => {
   // TODO: this should hit a webhook ideally
   if (err instanceof AxiosError) {
-    console.error(err.message, err.code);
+    logger.error(err.message, err.code);
   } else {
-    console.error(err);
+    logger.error(err);
   }
 };
 
-const log = (message: string, extra?: Record<any, unknown>): void => {
-  console.log(JSON.stringify({ message, ...extra, time: new Date() }, null, 4));
-};
+const logger = functions.logger;
 
 /**
  * ====================
@@ -75,9 +73,9 @@ export default functions.pubsub
   .schedule("*/15 * * * *")
   .onRun(async (): Promise<void> => {
     try {
-      log("Starting");
+      logger.log("Starting");
       await run();
-      log("Finished");
+      logger.log("Finished");
     } catch (err: any) {
       handleError(err);
     }
@@ -86,6 +84,6 @@ export default functions.pubsub
 if (!functionsConfig) {
   console.log("running as script");
   run()
-    .then(() => log("Success"))
+    .then(() => logger.log("Success"))
     .catch(handleError);
 }
