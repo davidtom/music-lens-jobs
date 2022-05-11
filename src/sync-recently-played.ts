@@ -56,7 +56,7 @@ export const run = async (): Promise<void> => {
 const handleError = (err: any): void => {
   // TODO: this should hit a webhook ideally
   if (err instanceof AxiosError) {
-    logger.error(err.message, err.code);
+    logger.error(err.message, { status: err.code });
   } else {
     logger.error(err);
   }
