@@ -43,7 +43,7 @@ export const run = async (): Promise<void> => {
 
       logger.log("Sync succeeded", syncResult);
     } catch (err: any) {
-      handleError(err);
+      handleError(err, { userId: user.id });
     }
   }
 };
@@ -53,12 +53,12 @@ export const run = async (): Promise<void> => {
  *    Helper Methods
  * ====================
  */
-const handleError = (err: any): void => {
+const handleError = (err: any, extra?: Record<string, any>): void => {
   // TODO: this should hit a webhook ideally
   if (err instanceof AxiosError) {
-    logger.error(err.message, { status: err.code });
+    logger.error(err.message, { status: err.code, ...extra });
   } else {
-    logger.error(err);
+    logger.error(err.message, { ...extra });
   }
 };
 
