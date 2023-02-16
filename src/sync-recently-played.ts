@@ -70,7 +70,7 @@ const logger = functions.logger;
  * ====================
  */
 export default functions.pubsub
-  .schedule("*/15 * * * *")
+  .schedule("*/10 * * * *")
   .onRun(async (): Promise<void> => {
     try {
       logger.log("Starting");
