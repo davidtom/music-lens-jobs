@@ -16,29 +16,31 @@ if (Object.keys(functionsConfig || {}).length === 0) {
   functionsConfig = undefined;
 }
 
+const parsedConfig = Config.safeParse(functionsConfig || process.env);
+if (!parsedConfig.success) {
+  throw parsedConfig.error;
+}
+
+const { data: config } = parsedConfig;
+const { origin, api_secret } = config;
+
+const client = axios.create({
+  baseURL: origin,
+  headers: {
+    Authorization: `Bearer ${api_secret}`,
+  },
+});
+
 export const run = async (): Promise<void> => {
-  const parsedConfig = Config.safeParse(functionsConfig || process.env);
-  if (!parsedConfig.success) {
-    throw parsedConfig.error;
-  }
-
-  const { data: config } = parsedConfig;
-  const { origin, api_secret } = config;
-
   // Get user ids json array
-  const { data: users } = await axios.get<User[]>(`${origin}/api/users/`);
+  const { data: users } = await client.get<User[]>("/api/users/");
 
   // Hit each sync recently-played user endpoint individually; Try/catch each call so a failure
   // in one user doesnt block the rest
   for (const user of users) {
     try {
-      const { data: syncResult } = await axios(
-        `${origin}/api/sync/recently-played/${user.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${api_secret}`,
-          },
-        }
+      const { data: syncResult } = await client.post(
+        `/api/sync/recently-played/${user.id}`
       );
 
       logger.log("Sync succeeded", syncResult);
