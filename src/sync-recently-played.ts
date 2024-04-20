@@ -33,7 +33,7 @@ const client = axios.create({
 
 export const run = async (): Promise<void> => {
   // Get user ids json array
-  const { data: users } = await client.get<User[]>("/api/users/");
+  const { data: users } = await client.get<User[]>("/api/sync/users/");
 
   // Hit each sync recently-played user endpoint individually; Try/catch each call so a failure
   // in one user doesnt block the rest
