@@ -1,4 +1,4 @@
-# Musice Lense Jobs
+# Musice Lens Jobs
 
 ## Deploy
 
